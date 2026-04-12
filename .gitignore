@@ -1,0 +1,61 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+backend/.env
+frontend/.env
+apigateway/.env
+extension/.env
+
+# Dependencies
+node_modules/
+node_modules
+
+# Build/Output
+dist/
+build/
+coverage/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+temp/
+tmp/
+.cache/
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Docs and Guides
+aws_*.md.resolved
+*aws*.md
+EMAIL_SETUP.md
+
+# Docker
+.dockerignore
+docker-compose.yml
+
+# SonarQube
+sonar-project.properties
+.scannerwork/
