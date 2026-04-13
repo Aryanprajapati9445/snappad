@@ -1,16 +1,17 @@
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-import fs from 'fs';
-import path from 'path';
+const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Fetches secrets from AWS Secrets Manager and writes them to a .env file.
  * This is meant to be run as a prestart script during EC2 deployment.
+ * NOTE: Written in pure JS to avoid dependency on ts-node in production.
  */
 async function fetchSecrets() {
-  // Region must match where your secret is created
-  const region = process.env.AWS_REGION || 'us-east-1';
-  // Secret ID/Name configured in your environment or passed as arg
-  const secretName = process.env.AWS_SECRET_ID || 'snappad-backend-secrets';
+  // Region defaults to ap-south-1 as per deployment guide
+  const region = process.env.AWS_REGION || 'ap-south-1';
+  // Secret ID defaults to the production backend secret
+  const secretName = process.env.AWS_SECRET_ID || 'snappad/production/backend';
 
   console.log(`🔍 Fetching secrets from AWS Secrets Manager (Region: ${region}, Secret: ${secretName})...`);
 
@@ -41,7 +42,13 @@ async function fetchSecrets() {
     console.log(`✅ Successfully wrote secrets to ${envFilePath}`);
 
   } catch (error) {
-    console.error('❌ Failed to fetch secrets from AWS Secrets Manager:', error);
+    if (error.name === 'ResourceNotFoundException') {
+      console.error(`❌ Secret '${secretName}' not found in region '${region}'.`);
+    } else if (error.name === 'CredentialsProviderError') {
+      console.error(`❌ AWS credentials missing. Ensure IAM Role is attached to EC2 or AWS CLI is configured.`);
+    } else {
+      console.error('❌ Failed to fetch secrets from AWS Secrets Manager:', error);
+    }
     process.exit(1);
   }
 }
