@@ -10,8 +10,8 @@ const path = require('path');
 async function fetchSecrets() {
   // Region defaults to ap-south-1 as per deployment guide
   const region = process.env.AWS_REGION || 'ap-south-1';
-  // Secret ID defaults to the production backend secret
-  const secretName = process.env.AWS_SECRET_ID || 'snappad/production/backend';
+  // Secret ID defaults to the correct name 'snappad-backend-secrets'
+  const secretName = process.env.AWS_SECRET_ID || 'snappad-backend-secrets';
 
   console.log(`🔍 Fetching secrets from AWS Secrets Manager (Region: ${region}, Secret: ${secretName})...`);
 
