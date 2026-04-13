@@ -13,6 +13,9 @@ import { errorHandler, notFound } from './middleware/errorHandler';
 
 const app = express();
 
+// Trust the first proxy (Nginx) so rate limiters use the real client IP
+app.set('trust proxy', 1);
+
 // Configure AWS S3
 configureS3();
 
