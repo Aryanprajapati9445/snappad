@@ -25,21 +25,45 @@ app.use(helmet({
 }));
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-const rawOrigins = process.env.ALLOWED_ORIGINS || process.env.CLIENT_URL || 'http://localhost:5173';
-const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://dtgv51v7rcwge.cloudfront.net/" // 🔥 replace with your real domain
+];
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || origin.startsWith('chrome-extension://') || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS: Origin ${origin} not allowed`));
+    // allow requests with no origin (like Postman / mobile apps)
+    if (!origin) return callback(null, true);
+
+    // allow chrome extensions (optional)
+    if (origin.startsWith("chrome-extension://")) {
+      return callback(null, true);
     }
+
+    // allow whitelisted origins
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    console.log("❌ Blocked by CORS:", origin);
+    return callback(new Error("CORS not allowed"));
   },
+
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
-  exposedHeaders: ['X-Request-ID', 'X-API-Version'],
+
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Request-ID"
+  ],
+
+  exposedHeaders: [
+    "X-Request-ID",
+    "X-API-Version"
+  ]
 }));
 
 // ── Request ID (attach unique ID to every request for tracing) ────────────────
