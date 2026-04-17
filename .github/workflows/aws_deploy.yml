@@ -1,34 +1,22 @@
-name: Deploy — Frontend (S3/CloudFront) + Backend (EC2)
+name: Deploy to S3 + CloudFront
 
 on:
-  push:
-    branches: [main]
+  
   workflow_dispatch:
 
-
 jobs:
- 
-  deploy-frontend:
-    name: 🌐 Frontend → S3 + CloudFront
+  deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push'  }}
     defaults:
       run:
-        working-directory: frontend
+        working-directory: notes-app-preview
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
+        uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build project
         env:
@@ -37,27 +25,21 @@ jobs:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: npm run build
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Sync build to S3
+      - name: Deploy to S3
+        env:
+         
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          aws s3 sync dist/ s3://snappad \
-            --delete \
-            --cache-control "no-cache" \
-            --exclude "assets/*"
-          # Long-cache for hashed assets
-          aws s3 sync dist/assets/ s3://snappad/assets/ \
-            --cache-control "public, max-age=31536000, immutable"
+          aws s3 sync dist/ s3://snappad --delete
 
       - name: Invalidate CloudFront cache
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           aws cloudfront create-invalidation \
             --distribution-id E1BBI8MW8MWD3Z \
             --paths "/*"
-
-  
