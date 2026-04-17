@@ -30,9 +30,9 @@ const setTokenCookies = (res: Response, accessToken: string, refreshToken: strin
   const cookieOpts = {
     httpOnly: true,
     secure: isProd,
-    // Use 'none' in prod so cookies are sent cross-site (CloudFront → EC2 backend).
-    // 'none' requires secure:true, which is enforced above in prod. Use 'lax' in dev.
-    sameSite: isProd ? ('none' as const) : ('lax' as const),
+    // Both frontend (S3/CloudFront) and API (/api/*) share the same CloudFront domain,
+    // so cookies are same-site. 'lax' is preferred over 'none' for better security.
+    sameSite: isProd ? ('lax' as const) : ('lax' as const),
   };
 
   // Cookie maxAge matches JWT expiry (1d access, 7d refresh)
@@ -46,7 +46,7 @@ const getCookieOpts = () => {
   return {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? ('none' as const) : ('lax' as const),
+    sameSite: 'lax' as const,
   };
 };
 
