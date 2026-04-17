@@ -15,7 +15,7 @@ export default defineConfig({
       '/api': {
         // Pointing the Vite proxy to your live EC2 servers avoids all CORS headers 
         // issues by masking it as a local request in your browser
-        target: 'http://65.0.29.24', 
+        target: 'http://13.233.111.228', 
         changeOrigin: true,
         secure: false,
       },

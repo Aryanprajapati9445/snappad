@@ -8,8 +8,8 @@ import { useAuthStore } from '../store/authStore';
 import { LoginFormData } from '../types';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 
-const hasGoogleClientId = !!(import.meta.env.VITE_GOOGLE_CLIENT_ID &&
-  import.meta.env.VITE_GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID_HERE');
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '564623113216-mni1j9tkaq2q6q1tkooivoigkfna1fie.apps.googleusercontent.com';
+const hasGoogleClientId = !!(CLIENT_ID && CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID_HERE');
 
 export default function LoginPage() {
   const navigate = useNavigate();

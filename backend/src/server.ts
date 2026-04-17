@@ -28,7 +28,7 @@ app.use(helmet({
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://dtgv51v7rcwge.cloudfront.net/" // 🔥 replace with your real domain
+  "https://dtgv51v7rcwge.cloudfront.net",  // CloudFront frontend — NO trailing slash!
 ];
 
 app.use(cors({

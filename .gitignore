@@ -59,3 +59,9 @@ docker-compose.yml
 # SonarQube
 sonar-project.properties
 .scannerwork/
+
+# EC2 server scripts (server-specific, not for version control)
+ec2_setup.sh
+
+# Production env templates (contain real secrets)
+backend/.env.production.example

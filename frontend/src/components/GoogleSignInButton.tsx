@@ -13,7 +13,7 @@ interface GoogleSignInButtonProps {
   label?: string;
 }
 
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
+const CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string) || '564623113216-mni1j9tkaq2q6q1tkooivoigkfna1fie.apps.googleusercontent.com';
 
 // Extend Window to include the google GSI namespace
 declare global {
