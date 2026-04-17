@@ -22,6 +22,9 @@ configureS3();
 // ── Security headers ──────────────────────────────────────────────────────────
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
+  // Disable COOP — Google GSI uses window.postMessage between its iframe
+  // and the parent page. The default 'same-origin' COOP header blocks that.
+  crossOriginOpenerPolicy: false,
 }));
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
