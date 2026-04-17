@@ -4,25 +4,14 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      target:
-        description: 'What to deploy'
-        required: true
-        default: 'both'
-        type: choice
-        options:
-          - both
-          - frontend-only
-          - backend-only
+
 
 jobs:
-  # ─────────────────────────────────────────────────────────────
-  # JOB 1: Build React app and deploy to S3 + CloudFront
-  # ─────────────────────────────────────────────────────────────
+ 
   deploy-frontend:
     name: 🌐 Frontend → S3 + CloudFront
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || inputs.target == 'both' || inputs.target == 'frontend-only' }}
+    if: ${{ github.event_name == 'push'  }}
     defaults:
       run:
         working-directory: frontend
@@ -68,39 +57,7 @@ jobs:
       - name: Invalidate CloudFront cache
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id E21PAW4VW19RL4 \
+            --distribution-id E1BBI8MW8MWD3Z \
             --paths "/*"
 
-  # ─────────────────────────────────────────────────────────────
-  # JOB 2: SSH into EC2 and pull + rebuild backend
-  # ─────────────────────────────────────────────────────────────
-  deploy-backend:
-    name: 🖥️ Backend → EC2
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || inputs.target == 'both' || inputs.target == 'backend-only' }}
-
-    steps:
-      - name: Deploy backend to EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            set -e
-            cd /home/ubuntu/snappad
-
-            echo "📥 Pulling latest code..."
-            git pull origin main
-
-            echo "📦 Installing backend dependencies..."
-            npm ci --workspace backend
-
-            echo "🔨 Building TypeScript..."
-            npm run build --workspace backend
-
-            echo "♻️  Restarting PM2 process..."
-            pm2 restart snappad-backend --update-env
-
-            echo "✅ Backend deployed successfully"
-            pm2 status
+  
